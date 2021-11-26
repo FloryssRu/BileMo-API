@@ -6,15 +6,16 @@ use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 class UserFixtures extends Fixture
 {
     private $hasher;
 
-    public function __construct(UserPasswordHasherInterface $hasher)
+    public function __construct(PasswordHasherFactoryInterface $factory)
     {
-        $this->hasher = $hasher;
+        $user = new User();
+        $this->hasher = $factory->getPasswordHasher($user);
     }
 
     public function load(ObjectManager $manager): void
@@ -23,7 +24,7 @@ class UserFixtures extends Fixture
         $user
             ->setUsername('User1')
             ->setEmail('floryss.devweb+1@gmail.com')
-            ->setPassword($this->hasher->hashPassword($user, 'secret'))
+            ->setPassword($this->hasher->hash('secret'))
             ->setCreatedAt(new DateTimeImmutable())
             ->setToken('token123')
         ;
@@ -33,7 +34,7 @@ class UserFixtures extends Fixture
         $user2
             ->setUsername('User2')
             ->setEmail('floryss.devweb+2@gmail.com')
-            ->setPassword($this->hasher->hashPassword($user2, 'secret'))
+            ->setPassword($this->hasher->hash('secret'))
             ->setCreatedAt(new DateTimeImmutable())
             ->setToken('token123')
         ;
