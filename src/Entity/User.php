@@ -129,7 +129,6 @@ class User implements PasswordAuthenticatedUserInterface
     public function removeClient(client $client): self
     {
         if ($this->clients->removeElement($client)) {
-            // set the owning side to null (unless already changed)
             if ($client->getUser() === $this) {
                 $client->setUser(null);
             }
