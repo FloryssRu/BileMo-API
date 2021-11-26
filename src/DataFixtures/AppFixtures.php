@@ -124,14 +124,14 @@ Sa meilleure note est due à son autonomie largement supérieure, en grande part
     {
         foreach ($this->data() as $data) {
             $product = new Product();
-            $product->create(
-                $data['name'],
-                $data['description'],
-                $data['price'],
-                $data['brand'],
-                $data['statut'],
-                new DateTimeImmutable()
-            );
+            $product
+                ->setName($data['name'])
+                ->setDescription($data['description'])
+                ->setPrice($data['price'])
+                ->setBrand($data['brand'])
+                ->setStatut($data['statut'])
+                ->setCreatedAt(new DateTimeImmutable())
+            ;
             $manager->persist($product);
         }
         

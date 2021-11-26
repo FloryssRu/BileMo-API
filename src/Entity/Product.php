@@ -141,22 +141,4 @@ class Product
 
         return $this;
     }
-
-    public function create(
-        string $name,
-        string $description,
-        float $price,
-        string $brand,
-        bool $statut,
-        \DateTimeImmutable $createdAt
-    ): self
-    {
-        $this->setName($name);
-        $this->setDescription($description);
-        $this->setPrice($price);
-        $this->setBrand($brand);
-        $this->setStatut($statut);
-        $this->setCreatedAt($createdAt);
-        return $this;
-    }
 }
