@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ProductRepository;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -50,7 +51,7 @@ class Product
     /**
      * @ORM\Column(type="datetime_immutable", nullable=true)
      */
-    private $modifiedAt;
+    private $modifiedAt = null;
 
     public function getId(): ?int
     {
@@ -138,6 +139,24 @@ class Product
     {
         $this->modifiedAt = $modifiedAt;
 
+        return $this;
+    }
+
+    public function create(
+        string $name,
+        string $description,
+        float $price,
+        string $brand,
+        bool $statut,
+        \DateTimeImmutable $createdAt
+    ): self
+    {
+        $this->setName($name);
+        $this->setDescription($description);
+        $this->setPrice($price);
+        $this->setBrand($brand);
+        $this->setStatut($statut);
+        $this->setCreatedAt($createdAt);
         return $this;
     }
 }
