@@ -44,6 +44,11 @@ class User
      */
     private $clients;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $token;
+
     public function __construct()
     {
         $this->clients = new ArrayCollection();
@@ -128,6 +133,18 @@ class User
                 $client->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(string $token): self
+    {
+        $this->token= $token;
 
         return $this;
     }
