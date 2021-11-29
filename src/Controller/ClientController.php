@@ -2,9 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Client;
 use App\Repository\ClientRepository;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -43,6 +47,27 @@ class ClientController extends AbstractController
         return new JsonResponse(
             $this->serializer->serialize($client, "json"),
             JsonResponse::HTTP_OK,
+            [],
+            true
+        );
+    }
+
+    /**
+     * @Route("/create", name="api_client_create", methods={"POST"})
+     */
+    public function create(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $client = $this->serializer->deserialize($request->getContent(), Client::class, 'json');
+
+        // set the user here
+        //client->setUser();
+
+        $em->persist($client);
+        $em->flush();
+
+        return new JsonResponse(
+            $this->serializer->serialize($client, 'json', ['groups' => 'create']),
+            JsonResponse::HTTP_CREATED,
             [],
             true
         );
