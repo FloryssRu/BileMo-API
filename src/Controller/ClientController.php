@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Client;
 use App\Repository\ClientRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
