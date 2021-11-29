@@ -130,7 +130,6 @@ Sa meilleure note est due à son autonomie largement supérieure, en grande part
                 ->setPrice($data['price'])
                 ->setBrand($data['brand'])
                 ->setStatut($data['statut'])
-                ->setCreatedAt(new DateTimeImmutable())
             ;
             $manager->persist($product);
         }
