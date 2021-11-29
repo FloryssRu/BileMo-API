@@ -72,4 +72,17 @@ class ClientController extends AbstractController
             true
         );
     }
+
+    /**
+     * @Route("/delete/{id}", name="api_client_delete", methods={"DELETE"})
+     */
+    public function delete(int $id, ClientRepository $clientRepository, EntityManagerInterface $em): JsonResponse
+    {
+        $client = $clientRepository->findOneBy(['id' => $id]);
+
+        $em->remove($client);
+        $em->flush();
+
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+    }
 }
