@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ClientRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=ClientRepository::class)
@@ -19,21 +20,25 @@ class Client
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("create")
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("create")
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups("create")
      */
     private $password;
 
     /**
      * @ORM\Column(type="datetime_immutable")
+     * @Groups("create")
      */
     private $createdAt;
 
@@ -42,6 +47,11 @@ class Client
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {

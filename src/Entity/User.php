@@ -35,7 +35,7 @@ class User
     private $createdAt;
 
     /**
-     * @ORM\OneToMany(targetEntity=client::class, mappedBy="user")
+     * @ORM\OneToMany(targetEntity=Client::class, mappedBy="user")
      */
     private $clients;
 
@@ -46,6 +46,7 @@ class User
 
     public function __construct()
     {
+        $this->createdAt = new \DateTimeImmutable();
         $this->clients = new ArrayCollection();
     }
 
