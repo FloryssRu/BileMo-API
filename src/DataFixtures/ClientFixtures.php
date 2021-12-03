@@ -14,8 +14,8 @@ class ClientFixtures extends Fixture
 
     public function __construct(PasswordHasherFactoryInterface $factory)
     {
-        $user = new Client();
-        $this->hasher = $factory->getPasswordHasher($user);
+        $client = new Client();
+        $this->hasher = $factory->getPasswordHasher($client);
     }
 
     public function load(ObjectManager $manager): void
