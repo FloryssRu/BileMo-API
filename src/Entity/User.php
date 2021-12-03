@@ -3,15 +3,12 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
-class User implements PasswordAuthenticatedUserInterface
+class User
 {
     /**
      * @ORM\Id
@@ -23,7 +20,12 @@ class User implements PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=180)
      */
-    private $username;
+    private $firstName;
+
+    /**
+     * @ORM\Column(type="string", length=180)
+     */
+    private $lastName;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -31,29 +33,18 @@ class User implements PasswordAuthenticatedUserInterface
     private $email;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $password;
-
-    /**
      * @ORM\Column(type="datetime_immutable")
      */
     private $createdAt;
 
     /**
-     * @ORM\OneToMany(targetEntity=Client::class, mappedBy="user")
+     * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="users")
      */
-    private $clients;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $token;
+    private $client;
 
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
-        $this->clients = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -61,19 +52,31 @@ class User implements PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getUsername(): ?string
+    public function getFirstName(): string
     {
-        return $this->username;
+        return $this->firstName;
     }
 
-    public function setUsername(string $username): self
+    public function setFirstName(string $firstName): self
     {
-        $this->username = $username;
+        $this->firstName = $firstName;
+
+        return $this;
+    }    
+
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): self
+    {
+        $this->lastName = $lastName;
 
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -85,19 +88,7 @@ class User implements PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPassword(): ?string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
@@ -109,43 +100,14 @@ class User implements PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection|client[]
-     */
-    public function getClients(): Collection
+    public function getClient(): ?Client
     {
-        return $this->clients;
+        return $this->client;
     }
 
-    public function addClient(client $client): self
+    public function setClient(?Client $client): self
     {
-        if (!$this->clients->contains($client)) {
-            $this->clients[] = $client;
-            $client->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeClient(client $client): self
-    {
-        if ($this->clients->removeElement($client)) {
-            if ($client->getUser() === $this) {
-                $client->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getToken(): ?string
-    {
-        return $this->token;
-    }
-
-    public function setToken(string $token): self
-    {
-        $this->token= $token;
+        $this->client = $client;
 
         return $this;
     }
