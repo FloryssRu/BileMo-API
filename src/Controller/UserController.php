@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Client;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -58,8 +59,7 @@ class UserController extends AbstractController
     {
         $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
 
-        // set the client here
-        //user->setClient();
+        $user->setClient($this->getUser());
 
         $em->persist($user);
         $em->flush();

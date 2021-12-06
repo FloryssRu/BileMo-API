@@ -14,12 +14,12 @@ lexik_jwt_authentication:
         #signature_algorithm: RS256
 
     # token extraction settings
-    #token_extractors:
+    token_extractors:
         # look for a token as Authorization Header
-        #authorization_header:
-            #enabled: true
-            #prefix: Bearer
-            #name: Authorization
+        authorization_header:
+            enabled: true
+            prefix: Bearer
+            name: Authorization
 
         # check token in a cookie
         #cookie:

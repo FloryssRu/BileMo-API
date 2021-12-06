@@ -12,10 +12,9 @@ class ApiLoginController extends AbstractController
     /**
      * @Route("/login", name="api_login", methods={"POST"})
      */
-    public function index(#[CurrentUser] ?Client $client): Response
+    public function index(#[CurrentUser] ?Client $client)/*: Response*/
     {
-        dd('je suis appelé');
-        if (null === $client) {
+        /*if (null === $client) {
             return $this->json([
                 'message' => 'missing credentials',
             ], Response::HTTP_UNAUTHORIZED);
@@ -26,6 +25,6 @@ class ApiLoginController extends AbstractController
         return $this->json([
             'message' => 'Welcome to your new controller!',
             'path' => 'src/Controller/ApiLoginController.php',
-        ]);
+        ]);*/
     }
 }
