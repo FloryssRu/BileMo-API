@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -19,21 +20,37 @@ class User
 
     /**
      * @ORM\Column(type="string", length=180)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *      min=2,
+     *      max=180
+     * )
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=180)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *      min=2,
+     *      max=180
+     * )
      */
     private $lastName;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *      min=2,
+     *      max=255
+     * )
      */
     private $email;
 
     /**
      * @ORM\Column(type="datetime_immutable")
+     * @Assert\NotBlank
      */
     private $createdAt;
 
