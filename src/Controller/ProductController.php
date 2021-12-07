@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Repository\ProductRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -51,12 +50,14 @@ class ProductController extends AbstractController
     /**
      * @Route("/{id}", name="api_product_item", methods={"GET"})
      */
-    public function item(): JsonResponse
+    public function item(int $id): JsonResponse
     {
-        $response = $this->cache->get('product_item', function (ItemInterface $item, int $id) {
+        $this->id = $id;
+
+        $response = $this->cache->get('products_item_' . $this->id, function (ItemInterface $item) {
             $item->expiresAfter(3600);
 
-            return $this->serializer->serialize($this->productRepository->findOneBy(['id' => $id]), "json");
+            return $this->serializer->serialize($this->productRepository->findOneBy(['id' => $this->id]), "json");
         });
 
         return new JsonResponse(

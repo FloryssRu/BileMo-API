@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -15,6 +16,7 @@ class User
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("get")
      */
     private $id;
 
@@ -25,6 +27,7 @@ class User
      *      min=2,
      *      max=180
      * )
+     * @Groups("get")
      */
     private $firstName;
 
@@ -35,6 +38,7 @@ class User
      *      min=2,
      *      max=180
      * )
+     * @Groups("get")
      */
     private $lastName;
 
@@ -45,17 +49,20 @@ class User
      *      min=2,
      *      max=255
      * )
+     * @Groups("get")
      */
     private $email;
 
     /**
      * @ORM\Column(type="datetime_immutable")
      * @Assert\NotBlank
+     * @Groups("get")
      */
     private $createdAt;
 
     /**
      * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="users")
+     * @Groups("get")
      */
     private $client;
 
