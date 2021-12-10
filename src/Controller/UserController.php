@@ -10,6 +10,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -86,6 +87,29 @@ class UserController extends AbstractController
         return new JsonResponse(
             $this->serializer->serialize($user, 'json', ['groups' => 'create']),
             JsonResponse::HTTP_CREATED,
+            [],
+            true
+        );
+    }
+
+    /**
+     * @Route("/edit/{id}", name="api_user_put", methods={"PUT"})
+     */
+    public function put(Request $request, EntityManagerInterface $em, int $id): JsonResponse
+    {
+        $user = $this->userRepository->findOneBy(['id' => $id]);
+        $user = $this->serializer->deserialize(
+            $request->getContent(),
+            User::class,
+            'json',
+            [AbstractNormalizer::OBJECT_TO_POPULATE => $user]
+        );
+
+        $em->flush();
+
+        return new JsonResponse(
+            $this->serializer->serialize($user, 'json', ['groups' => 'create']),
+            JsonResponse::HTTP_OK,
             [],
             true
         );
