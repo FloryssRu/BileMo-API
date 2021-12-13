@@ -41,6 +41,4 @@ class ExceptionListener
 
         $event->setResponse($response);
     }
-    /*$request = $event->getRequest();
-    if (in_array("* /*", $request->getAcceptableContentTypes()) || in_array("application/json", $request->getAcceptableContentTypes()))*/
 }
