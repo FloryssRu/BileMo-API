@@ -11,20 +11,31 @@ class ExceptionListener
     public function onKernelException(ExceptionEvent $event)
     {
         $exception = $event->getThrowable();
-
-        $message = sprintf(
-            '%s : code %s',
-            $exception->getMessage(),
-            $exception->getCode()
-        );
             
         $response = new JsonResponse();
-        $response->setContent('{ "erreur": "' . $message . '"}');
 
         if ($exception instanceof HttpExceptionInterface) {
             $response->setStatusCode($exception->getStatusCode());
             $response->headers->replace($exception->getHeaders());
+
+            switch ($exception->getStatusCode()) {
+                case 403:
+                    $message = "Vous n'avez pas les droits requis.";
+                    break;
+                case 404:
+                    $message = "L'information n'existe pas.";
+                    break;
+                case 500:
+                    $message = "Une erreur serveur est survenue.";
+                    break;
+                default:
+                    $message = "Une erreur est survenue.";
+                    break;
+            }
+
+            $response->setContent('{"code": "' . $exception->getStatusCode() . '", "erreur": "' . $message . '"}');
         } else {
+            $response->setContent('{"code": "500", "erreur": "Une erreur est survenue."}');
             $response->setStatusCode(JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
