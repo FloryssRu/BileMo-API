@@ -20,8 +20,10 @@ How to install it
 3) Create a new database : change the value of DATABASE_URL in the file .env to match with your database parameters.
 
 4) Run `symfony console doctrine:database:create` in command to create your database.
+   
+5) Run `symfony console doctrine:migrations:migrate` to apply all migrations files.
 
-5) Generate user and phone fixtures with the command `symfony console doctrine:fixtures:load`.
+6) Generate user and phone fixtures with the command `symfony console doctrine:fixtures:load`.
 
 Code Climate analysis
 -
