@@ -6,6 +6,7 @@ use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -50,12 +51,16 @@ class ProductController extends AbstractController
     /**
      * @Route("/{id}", name="api_product_item", methods={"GET"})
      */
-    public function item(int $id): JsonResponse
+    public function item($id): JsonResponse
     {
         $this->id = $id;
 
         $response = $this->cache->get('products_item_' . $this->id, function (ItemInterface $item) {
             $item->expiresAfter(3600);
+
+            if ($this->productRepository->findOneBy(['id' => $this->id]) === NULL || !is_int($this->id)) {
+                throw new HttpException(404);
+            }
 
             return $this->serializer->serialize($this->productRepository->findOneBy(['id' => $this->id]), "json");
         });

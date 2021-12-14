@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -54,12 +55,16 @@ class UserController extends AbstractController
     /**
      * @Route("/{id}", name="api_user_item", methods={"GET"})
      */
-    public function item(int $id): JsonResponse
+    public function item($id): JsonResponse
     {
         $this->id = $id;
 
         $response = $this->cache->get('users_item_' . $this->id, function (ItemInterface $item) {
             $item->expiresAfter(3600);
+
+            if ($this->userRepository->findOneBy(['id' => $this->id]) === NULL || !is_int($this->id)) {
+                throw new HttpException(404);
+            }
 
             return $this->serializer->serialize($this->userRepository->findOneBy(['id' => $this->id]), "json", ['groups' => 'get']);
         });
