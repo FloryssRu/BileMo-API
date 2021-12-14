@@ -4,9 +4,16 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @UniqueEntity(
+ *      fields = "email",
+ *      message = "Email déjà utilisée."
+ * )
  */
 class User
 {
@@ -14,31 +21,53 @@ class User
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("get")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *      min=2,
+     *      max=180
+     * )
+     * @Groups("get")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=180)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *      min=2,
+     *      max=180
+     * )
+     * @Groups("get")
      */
     private $lastName;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *      min=2,
+     *      max=255
+     * )
+     * @Groups("get")
      */
     private $email;
 
     /**
      * @ORM\Column(type="datetime_immutable")
+     * @Assert\NotBlank
+     * @Groups("get")
      */
     private $createdAt;
 
     /**
      * @ORM\ManyToOne(targetEntity=Client::class, inversedBy="users")
+     * @Groups("get")
      */
     private $client;
 

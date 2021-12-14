@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ClientRepository::class)
@@ -31,12 +32,22 @@ class Client implements PasswordAuthenticatedUserInterface, UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("create")
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *      min=2,
+     *      max=255
+     * )
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups("create")
+     * @Assert\NotBlank
+     * @Assert\Length(
+     *      min=2,
+     *      max=255
+     * )
      */
     private $password;
 

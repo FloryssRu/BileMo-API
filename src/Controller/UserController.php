@@ -6,10 +6,14 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @Route("/users")
@@ -18,18 +22,30 @@ class UserController extends AbstractController
 {
     private $serializer;
 
-    public function __construct(SerializerInterface $serializer)
+    private $cache;
+
+    private $userRepository;
+
+    public function __construct(SerializerInterface $serializer, UserRepository $userRepository)
     {
         $this->serializer = $serializer;
+        $this->cache = new FilesystemAdapter();
+        $this->userRepository = $userRepository;
     }
 
     /**
      * @Route(name="api_user_list", methods={"GET"})
      */
-    public function collection(UserRepository $userRepository): JsonResponse
+    public function collection(): JsonResponse
     {
+        $response = $this->cache->get('users_collection', function (ItemInterface $item) {
+            $item->expiresAfter(3600);
+
+            return $this->serializer->serialize($this->userRepository->findAll(), "json", ['groups' => 'get']);
+        });
+
         return new JsonResponse(
-            $this->serializer->serialize($userRepository->findAll(), "json"),
+            $response,
             JsonResponse::HTTP_OK,
             [],
             true
@@ -39,12 +55,22 @@ class UserController extends AbstractController
     /**
      * @Route("/{id}", name="api_user_item", methods={"GET"})
      */
-    public function item(int $id, UserRepository $userRepository): JsonResponse
+    public function item($id): JsonResponse
     {
-        $user = $userRepository->findOneBy(['id' => $id]);
+        $this->id = $id;
+
+        $response = $this->cache->get('users_item_' . $this->id, function (ItemInterface $item) {
+            $item->expiresAfter(3600);
+
+            if ($this->userRepository->findOneBy(['id' => $this->id]) === NULL || !is_int($this->id)) {
+                throw new HttpException(404);
+            }
+
+            return $this->serializer->serialize($this->userRepository->findOneBy(['id' => $this->id]), "json", ['groups' => 'get']);
+        });
 
         return new JsonResponse(
-            $this->serializer->serialize($user, "json"),
+            $response,
             JsonResponse::HTTP_OK,
             [],
             true
@@ -66,6 +92,29 @@ class UserController extends AbstractController
         return new JsonResponse(
             $this->serializer->serialize($user, 'json', ['groups' => 'create']),
             JsonResponse::HTTP_CREATED,
+            [],
+            true
+        );
+    }
+
+    /**
+     * @Route("/edit/{id}", name="api_user_put", methods={"PUT"})
+     */
+    public function put(Request $request, EntityManagerInterface $em, int $id): JsonResponse
+    {
+        $user = $this->userRepository->findOneBy(['id' => $id]);
+        $user = $this->serializer->deserialize(
+            $request->getContent(),
+            User::class,
+            'json',
+            [AbstractNormalizer::OBJECT_TO_POPULATE => $user]
+        );
+
+        $em->flush();
+
+        return new JsonResponse(
+            $this->serializer->serialize($user, 'json', ['groups' => 'create']),
+            JsonResponse::HTTP_OK,
             [],
             true
         );
