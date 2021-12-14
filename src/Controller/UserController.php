@@ -5,6 +5,9 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,7 +37,19 @@ class UserController extends AbstractController
     }
 
     /**
+     * Lists the collection of all the users in database.
+     * 
      * @Route(name="api_user_list", methods={"GET"})
+     * @OA\Response(
+     *      response=201,
+     *      description="Lists the user collection",
+     *      @OA\JsonContent(
+     *          type="array",
+     *          @OA\Items(ref=@Model(type=User::class))
+     *     )
+     * )
+     * @OA\Tag(name="users")
+     * @Security(name="Bearer")
      */
     public function collection(): JsonResponse
     {
@@ -53,7 +68,55 @@ class UserController extends AbstractController
     }
 
     /**
+     * Create a new user with the data given
+     * 
+     * @Route("/create", name="api_user_create", methods={"POST"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Creates an user",
+     *     @OA\JsonContent(
+     *        type="array"
+     *     )
+     * )
+     * @OA\Tag(name="users")
+     */
+    public function create(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
+
+        $user->setClient($this->getUser());
+
+        $em->persist($user);
+        $em->flush();
+
+        return new JsonResponse(
+            $this->serializer->serialize($user, 'json', ['groups' => 'create']),
+            JsonResponse::HTTP_CREATED,
+            [],
+            true
+        );
+    }
+
+    /**
+     * Finds and return the user associate to the id given
+     * 
      * @Route("/{id}", name="api_user_item", methods={"GET"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns an user",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=User::class))
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="id",
+     *     in="query",
+     *     description="The field used to find the user",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="users")
+     * @Security(name="Bearer")
      */
     public function item($id): JsonResponse
     {
@@ -78,27 +141,23 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/create", name="api_user_create", methods={"POST"})
-     */
-    public function create(Request $request, EntityManagerInterface $em): JsonResponse
-    {
-        $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
-
-        $user->setClient($this->getUser());
-
-        $em->persist($user);
-        $em->flush();
-
-        return new JsonResponse(
-            $this->serializer->serialize($user, 'json', ['groups' => 'create']),
-            JsonResponse::HTTP_CREATED,
-            [],
-            true
-        );
-    }
-
-    /**
+     * Finds, modifies with the data given and return the user associate to the id given
+     * 
      * @Route("/edit/{id}", name="api_user_put", methods={"PUT"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns an user",
+     *     @OA\JsonContent(
+     *        type="array"
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="id",
+     *     in="query",
+     *     description="The field used to find the user",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="users")
      */
     public function put(Request $request, EntityManagerInterface $em, int $id): JsonResponse
     {
@@ -121,7 +180,14 @@ class UserController extends AbstractController
     }
 
     /**
+     * Delete the user related to the id given
+     * 
      * @Route("/delete/{id}", name="api_user_delete", methods={"DELETE"})
+     * @OA\Response(
+     *     response=204,
+     *     description="Delete an user"
+     * )
+     * @OA\Tag(name="users")
      */
     public function delete(int $id, UserRepository $userRepository, EntityManagerInterface $em): JsonResponse
     {
