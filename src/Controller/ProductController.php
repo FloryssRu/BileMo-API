@@ -2,7 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Product;
 use App\Repository\ProductRepository;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -30,7 +34,19 @@ class ProductController extends AbstractController
     }
 
     /**
+     * Lists the collection of all the phones in database.
+     * 
      * @Route(name="api_product_list", methods={"GET"})
+     * @OA\Response(
+     *      response=200,
+     *      description="Lists the phone collection",
+     *      @OA\JsonContent(
+     *          type="array",
+     *          @OA\Items(ref=@Model(type=Product::class))
+     *     )
+     * )
+     * @OA\Tag(name="products")
+     * @Security(name="Bearer")
      */
     public function collection(): JsonResponse
     {
@@ -49,7 +65,25 @@ class ProductController extends AbstractController
     }
 
     /**
+     * Finds and returns the product associate to the id given
+     * 
      * @Route("/{id}", name="api_product_item", methods={"GET"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns a product",
+     *     @OA\JsonContent(
+     *        type="array",
+     *        @OA\Items(ref=@Model(type=Product::class))
+     *     )
+     * )
+     * @OA\Parameter(
+     *     name="id",
+     *     in="query",
+     *     description="The field used to find the product",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="products")
+     * @Security(name="Bearer")
      */
     public function item($id): JsonResponse
     {
