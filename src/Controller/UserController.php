@@ -57,7 +57,7 @@ class UserController extends AbstractController
      */
     public function item($id): JsonResponse
     {
-        $this->id = $id;
+        $this->id = intval($id);
 
         $response = $this->cache->get('users_item_' . $this->id, function (ItemInterface $item) {
             $item->expiresAfter(3600);
