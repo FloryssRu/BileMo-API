@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 class ExceptionListener
 {
     public function onKernelException(ExceptionEvent $event)
-    {
+    {/*
         $exception = $event->getThrowable();
             
         $response = new JsonResponse();
@@ -39,6 +39,6 @@ class ExceptionListener
             $response->setStatusCode(JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        $event->setResponse($response);
+        $event->setResponse($response);*/
     }
 }
