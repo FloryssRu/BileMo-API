@@ -6,8 +6,8 @@ nelmio_api_doc:
             - ^api\.
     documentation:
         servers:
-          - url: http://127.0.0.1:8000/api/
-            description: API over HTTP
+            - url: http://127.0.0.1:8000/api/
+              description: API over HTTP
         info:
             title: BileMo API
             description: Provides you a phones database and a CRUD to manage your users

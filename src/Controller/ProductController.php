@@ -4,12 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Product;
 use App\Repository\ProductRepository;
+use Nelmio\ApiDocBundle\Annotation\Item;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -36,24 +38,35 @@ class ProductController extends AbstractController
     /**
      * Lists the collection of all the phones in database.
      * 
+     * Lists the collection of all the phones in database.
+     * 
      * @Route(name="api_product_list", methods={"GET"})
      * @OA\Response(
      *      response=200,
      *      description="Lists the phone collection",
      *      @OA\JsonContent(
-     *          type="array",
-     *          @OA\Items(ref=@Model(type=Product::class))
-     *     )
+     *              type="array",
+     *              @OA\Items(ref=@Model(type=Product::class))
+     *      )
      * )
+     * 
      * @OA\Tag(name="products")
      * @Security(name="Bearer")
      */
-    public function collection(): JsonResponse
+    public function collection(Request $request): JsonResponse
     {
+        if (0 < intval($request->query->get("offset"))) {
+            $offset = $request->query->get("offset");
+        } else {
+            $offset = 0;
+        }
+
+        $this->paginator = $this->productRepository->getProductPaginator($offset);
+
         $response = $this->cache->get('products_collection', function (ItemInterface $item) {
             $item->expiresAfter(3600);
 
-            return $this->serializer->serialize($this->productRepository->findAll(), "json");
+            return $this->serializer->serialize($this->paginator, "json");
         });
 
         return new JsonResponse(
