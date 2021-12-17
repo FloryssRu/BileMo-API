@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -41,12 +40,8 @@ class UserController extends AbstractController
      * 
      * @Route(name="api_user_list", methods={"GET"})
      * @OA\Response(
-     *      response=201,
-     *      description="Lists the user collection",
-     *      @OA\JsonContent(
-     *          type="array",
-     *          @OA\Items(ref=@Model(type=User::class))
-     *     )
+     *      response=200,
+     *      description="Lists the collection of users"
      * )
      * @OA\Tag(name="users")
      * @Security(name="Bearer")
@@ -72,13 +67,11 @@ class UserController extends AbstractController
      * 
      * @Route("/create", name="api_user_create", methods={"POST"})
      * @OA\Response(
-     *     response=200,
-     *     description="Creates an user",
-     *     @OA\JsonContent(
-     *        type="array"
-     *     )
+     *     response=201,
+     *     description="Creates an user"
      * )
      * @OA\Tag(name="users")
+     * @Security(name="Bearer")
      */
     public function create(Request $request, EntityManagerInterface $em): JsonResponse
     {
@@ -103,15 +96,11 @@ class UserController extends AbstractController
      * @Route("/{id}", name="api_user_item", methods={"GET"})
      * @OA\Response(
      *     response=200,
-     *     description="Returns an user",
-     *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=User::class))
-     *     )
+     *     description="Returns an user"
      * )
      * @OA\Parameter(
      *     name="id",
-     *     in="query",
+     *     in="path",
      *     description="The field used to find the user",
      *     @OA\Schema(type="int")
      * )
@@ -146,18 +135,16 @@ class UserController extends AbstractController
      * @Route("/edit/{id}", name="api_user_put", methods={"PUT"})
      * @OA\Response(
      *     response=200,
-     *     description="Returns an user",
-     *     @OA\JsonContent(
-     *        type="array"
-     *     )
+     *     description="Edit an user"
      * )
      * @OA\Parameter(
      *     name="id",
-     *     in="query",
+     *     in="path",
      *     description="The field used to find the user",
      *     @OA\Schema(type="int")
      * )
      * @OA\Tag(name="users")
+     * @Security(name="Bearer")
      */
     public function put(Request $request, EntityManagerInterface $em, int $id): JsonResponse
     {
@@ -187,7 +174,14 @@ class UserController extends AbstractController
      *     response=204,
      *     description="Delete an user"
      * )
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="The field used to find the user",
+     *     @OA\Schema(type="int")
+     * )
      * @OA\Tag(name="users")
+     * @Security(name="Bearer")
      */
     public function delete(int $id, UserRepository $userRepository, EntityManagerInterface $em): JsonResponse
     {

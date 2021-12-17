@@ -2,10 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Product;
 use App\Repository\ProductRepository;
-use Nelmio\ApiDocBundle\Annotation\Item;
-use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -38,18 +35,11 @@ class ProductController extends AbstractController
     /**
      * Lists the collection of all the phones in database.
      * 
-     * Lists the collection of all the phones in database.
-     * 
      * @Route(name="api_product_list", methods={"GET"})
      * @OA\Response(
      *      response=200,
-     *      description="Lists the phone collection",
-     *      @OA\JsonContent(
-     *              type="array",
-     *              @OA\Items(ref=@Model(type=Product::class))
-     *      )
+     *      description="Lists the phone collection"
      * )
-     * 
      * @OA\Tag(name="products")
      * @Security(name="Bearer")
      */
@@ -83,15 +73,11 @@ class ProductController extends AbstractController
      * @Route("/{id}", name="api_product_item", methods={"GET"})
      * @OA\Response(
      *     response=200,
-     *     description="Returns a product",
-     *     @OA\JsonContent(
-     *        type="array",
-     *        @OA\Items(ref=@Model(type=Product::class))
-     *     )
+     *     description="Returns a product"
      * )
      * @OA\Parameter(
      *     name="id",
-     *     in="query",
+     *     in="path",
      *     description="The field used to find the product",
      *     @OA\Schema(type="int")
      * )
