@@ -11,7 +11,21 @@ What it contains ?
 You can find in this repository a Symfony 5 skeleton structure with only the bundles require to make the API fonctionnal.  
 This project contains phones and users fixtures to test the API, entities, controllers and an ExceptionListener to return a valid response in json if an exception is thrown.  
 
-How to install it
+Documentation
+-
+You can find the documentation in these links :  
+Documentation [Json](http://127.0.0.1:8000/api/doc.json "Link to doc in json")  
+Documentation [HTML](http://127.0.0.1:8000/api/doc "Link to doc in html")
+
+What do I need ? - Prerequisite
+-
+You must have installed at least :  
+- PHP 8.0.10
+- Symfony 5.3.0
+- Composer
+- A software like Postman to test the API
+
+How to install the project
 -
 1) Clone or download this repository, create a new folder "BileMo" and place the projet in it.
 
@@ -27,4 +41,4 @@ How to install it
 
 Code Climate analysis
 -
-[![Maintainability](https://api.codeclimate.com/v1/badges/7881c04d4df0a4554aeb/maintainability)](https://codeclimate.com/github/FloryssRu/BileMo-API/maintainability)
+[![Maintainability](https://api.codeclimate.com/v1/badges/7881c04d4df0a4554aeb/maintainability)](https://codeclimate.com/github/FloryssRu/BileMo-API/maintainability "Analysis by CodeClimate")
