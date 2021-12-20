@@ -28,12 +28,6 @@ class ProductRepository extends ServiceEntityRepository
         $handlerQuery = new HandlerQuery();
         
         $query = $handlerQuery->createQuery($this, 'p', self::PRODUCTS_PER_PAGE, $page);
-        // $query = $this->createQueryBuilder('p')
-        //     ->orderBy('p.createdAt', 'DESC')
-        //     ->setMaxResults(self::PRODUCTS_PER_PAGE)
-        //     ->setFirstResult(($page - 1) * self::PRODUCTS_PER_PAGE)
-        //     ->getQuery()
-        // ;
 
         return new Paginator($query);
     }

@@ -28,12 +28,6 @@ class UserRepository extends ServiceEntityRepository
         $handlerQuery = new HandlerQuery();
 
         $query = $handlerQuery->createQuery($this, 'u', self::USERS_PER_PAGE, $page);
-        // $query = $this->createQueryBuilder('u')
-        //     ->orderBy('u.createdAt', 'DESC')
-        //     ->setMaxResults(self::USERS_PER_PAGE)
-        //     ->setFirstResult(($page - 1) * self::USERS_PER_PAGE)
-        //     ->getQuery()
-        // ;
 
         return new Paginator($query);
     }
