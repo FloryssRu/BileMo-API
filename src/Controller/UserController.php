@@ -56,10 +56,10 @@ class UserController extends AbstractController
 
         $this->paginator = $this->userRepository->getUserPaginator($page);
 
-        $response = $this->cache->get('users_collection', function (ItemInterface $item) {
+        $response = $this->cache->get('users_collection_' . $page, function (ItemInterface $item) {
             $item->expiresAfter(3600);
 
-            return $this->serializer->serialize($this->userRepository->findAll(), "json", ['groups' => 'get']);
+            return $this->serializer->serialize($this->paginator, "json", ['groups' => 'get']);
         });
 
         return new JsonResponse(

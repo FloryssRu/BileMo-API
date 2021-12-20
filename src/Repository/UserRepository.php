@@ -24,8 +24,8 @@ class UserRepository extends ServiceEntityRepository
 
     public function getUserPaginator(int $page): Paginator
     {
-        $query = $this->createQueryBuilder('p')
-            ->orderBy('p.createdAt', 'DESC')
+        $query = $this->createQueryBuilder('u')
+            ->orderBy('u.createdAt', 'DESC')
             ->setMaxResults(self::USERS_PER_PAGE)
             ->setFirstResult(($page - 1) * self::USERS_PER_PAGE)
             ->getQuery()
@@ -33,33 +33,4 @@ class UserRepository extends ServiceEntityRepository
 
         return new Paginator($query);
     }
-
-    // /**
-    //  * @return User[] Returns an array of User objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('u.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?User
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }
