@@ -46,8 +46,16 @@ class UserController extends AbstractController
      * @OA\Tag(name="users")
      * @Security(name="Bearer")
      */
-    public function collection(): JsonResponse
+    public function collection(Request $request): JsonResponse
     {
+        if (0 < intval($request->query->get("page"))) {
+            $page = intval($request->query->get("page"));
+        } else {
+            $page = 1;
+        }
+
+        $this->paginator = $this->userRepository->getUserPaginator($page);
+
         $response = $this->cache->get('users_collection', function (ItemInterface $item) {
             $item->expiresAfter(3600);
 
