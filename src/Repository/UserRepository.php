@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Services\HandlerQuery;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -11,7 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
  * @method User|null findOneBy(array $criteria, array $orderBy = null)
  * @method User[]    findAll()
- * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $page = null)
  */
 class UserRepository extends ServiceEntityRepository
 {
@@ -24,12 +25,15 @@ class UserRepository extends ServiceEntityRepository
 
     public function getUserPaginator(int $page): Paginator
     {
-        $query = $this->createQueryBuilder('u')
-            ->orderBy('u.createdAt', 'DESC')
-            ->setMaxResults(self::USERS_PER_PAGE)
-            ->setFirstResult(($page - 1) * self::USERS_PER_PAGE)
-            ->getQuery()
-        ;
+        $handlerQuery = new HandlerQuery();
+
+        $query = $handlerQuery->createQuery($this, 'u', self::USERS_PER_PAGE, $page);
+        // $query = $this->createQueryBuilder('u')
+        //     ->orderBy('u.createdAt', 'DESC')
+        //     ->setMaxResults(self::USERS_PER_PAGE)
+        //     ->setFirstResult(($page - 1) * self::USERS_PER_PAGE)
+        //     ->getQuery()
+        // ;
 
         return new Paginator($query);
     }

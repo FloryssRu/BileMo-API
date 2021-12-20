@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Product;
+use App\Services\HandlerQuery;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -24,12 +25,15 @@ class ProductRepository extends ServiceEntityRepository
 
     public function getProductPaginator(int $page): Paginator
     {
-        $query = $this->createQueryBuilder('p')
-            ->orderBy('p.createdAt', 'DESC')
-            ->setMaxResults(self::PRODUCTS_PER_PAGE)
-            ->setFirstResult(($page - 1) * self::PRODUCTS_PER_PAGE)
-            ->getQuery()
-        ;
+        $handlerQuery = new HandlerQuery();
+        
+        $query = $handlerQuery->createQuery($this, 'p', self::PRODUCTS_PER_PAGE, $page);
+        // $query = $this->createQueryBuilder('p')
+        //     ->orderBy('p.createdAt', 'DESC')
+        //     ->setMaxResults(self::PRODUCTS_PER_PAGE)
+        //     ->setFirstResult(($page - 1) * self::PRODUCTS_PER_PAGE)
+        //     ->getQuery()
+        // ;
 
         return new Paginator($query);
     }
