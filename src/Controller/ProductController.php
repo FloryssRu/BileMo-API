@@ -45,15 +45,15 @@ class ProductController extends AbstractController
      */
     public function collection(Request $request): JsonResponse
     {
-        if (0 < intval($request->query->get("offset"))) {
-            $offset = $request->query->get("offset");
+        if (0 < intval($request->query->get("page"))) {
+            $page = intval($request->query->get("page"));
         } else {
-            $offset = 0;
+            $page = 1;
         }
 
-        $this->paginator = $this->productRepository->getProductPaginator($offset);
+        $this->paginator = $this->productRepository->getProductPaginator($page);
 
-        $response = $this->cache->get('products_collection', function (ItemInterface $item) {
+        $response = $this->cache->get('products_collection_' . $page, function (ItemInterface $item) {
             $item->expiresAfter(3600);
 
             return $this->serializer->serialize($this->paginator, "json");

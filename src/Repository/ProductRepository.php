@@ -11,23 +11,23 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Product|null find($id, $lockMode = null, $lockVersion = null)
  * @method Product|null findOneBy(array $criteria, array $orderBy = null)
  * @method Product[]    findAll()
- * @method Product[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Product[]    findBy(array $criteria, array $orderBy = null, $limit = null, $page = null)
  */
 class ProductRepository extends ServiceEntityRepository
 {
-    public const PRODUCTS_PER_PAGE = 4;
+    public const PRODUCTS_PER_PAGE = 5;
 
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Product::class);
     }
 
-    public function getProductPaginator(int $offset): Paginator
+    public function getProductPaginator(int $page): Paginator
     {
         $query = $this->createQueryBuilder('p')
             ->orderBy('p.createdAt', 'DESC')
             ->setMaxResults(self::PRODUCTS_PER_PAGE)
-            ->setFirstResult($offset)
+            ->setFirstResult(($page - 1) * self::PRODUCTS_PER_PAGE + 1)
             ->getQuery()
         ;
 
