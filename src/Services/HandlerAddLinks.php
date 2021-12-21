@@ -9,10 +9,8 @@ class HandlerAddLinks
         $response = [];
 
         foreach ($data as $item) {
-            $class = strtolower(substr($item::class, 11)); //transforme "App\\Entity\\Product" en "product"
+            $class = strtolower(substr($item::class, 11));
 
-            //on ajoute quel que soit l'item le lien pour voir l'item
-            //si l'item est de classe User alors on ajoute les liens de modif, suppression et création
             if ($class === "user") {
                 $response[] = [
                     "item " . $item->getId() => $item,
@@ -34,7 +32,7 @@ class HandlerAddLinks
 
     public function addLinksItem($item): array
     {
-        $class = strtolower(substr($item::class, 11)); //transforme "App\\Entity\\Product" en "product"
+        $class = strtolower(substr($item::class, 11));
 
         if ($class === "user") {
             $response = [
