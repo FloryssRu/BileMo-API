@@ -61,8 +61,6 @@ class ProductController extends AbstractController
             $responseWithLinks = $handlerAddLinks->addLinksCollection($this->paginator);
 
             return $this->serializer->serialize($responseWithLinks, "json");
-
-            // return $this->serializer->serialize($this->paginator, "json");
         });
 
         return new JsonResponse(
@@ -101,7 +99,10 @@ class ProductController extends AbstractController
                 throw new HttpException(404);
             }
 
-            return $this->serializer->serialize($this->productRepository->findOneBy(['id' => $this->id]), "json");
+            $handlerAddLinks = new HandlerAddLinks();
+            $responseWithLinks = $handlerAddLinks->addLinksItem($this->productRepository->findOneBy(['id' => $this->id]));
+
+            return $this->serializer->serialize($responseWithLinks, "json");
         });
 
         return new JsonResponse(

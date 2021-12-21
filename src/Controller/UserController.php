@@ -58,14 +58,12 @@ class UserController extends AbstractController
         $this->paginator = $this->userRepository->getUserPaginator($page);
 
         $response = $this->cache->get('users_collection_' . $page, function (ItemInterface $item) {
-            $item->expiresAfter(600);
+            $item->expiresAfter(3600);
 
             $handlerAddLinks = new HandlerAddLinks();
             $responseWithLinks = $handlerAddLinks->addLinksCollection($this->paginator);
 
             return $this->serializer->serialize($responseWithLinks, "json", ['groups' => 'get']);
-
-            //return $this->serializer->serialize($this->paginator, "json", ['groups' => 'get']);
         });
 
         return new JsonResponse(
@@ -132,7 +130,10 @@ class UserController extends AbstractController
                 throw new HttpException(404);
             }
 
-            return $this->serializer->serialize($this->userRepository->findOneBy(['id' => $this->id]), "json", ['groups' => 'get']);
+            $handlerAddLinks = new HandlerAddLinks();
+            $responseWithLinks = $handlerAddLinks->addLinksItem($this->userRepository->findOneBy(['id' => $this->id]));
+
+            return $this->serializer->serialize($responseWithLinks, "json", ['groups' => 'get']);
         });
 
         return new JsonResponse(

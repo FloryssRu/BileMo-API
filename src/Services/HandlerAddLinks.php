@@ -31,4 +31,26 @@ class HandlerAddLinks
 
         return $response;
     }
+
+    public function addLinksItem($item): array
+    {
+        $class = strtolower(substr($item::class, 11)); //transforme "App\\Entity\\Product" en "product"
+
+        if ($class === "user") {
+            $response = [
+                "item" => $item,
+                "collection" => "http://127.0.0.1:8000/api/" . $class . "s",
+                "create" => "http://127.0.0.1:8000/api/users/create",
+                "edit" => "http://127.0.0.1:8000/api/" . $class . "s/edit/" . $item->getId(),
+                "delete" => "http://127.0.0.1:8000/api/" . $class . "s/delete/" . $item->getId()
+            ];
+        } else {
+            $response = [
+                "item" => $item,
+                "collection" => "http://127.0.0.1:8000/api/" . $class . "s"
+            ];
+        }
+
+        return $response;
+    }
 }
