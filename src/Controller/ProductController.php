@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\ProductRepository;
+use App\Services\HandlerAddLinks;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -56,7 +57,12 @@ class ProductController extends AbstractController
         $response = $this->cache->get('products_collection_' . $page, function (ItemInterface $item) {
             $item->expiresAfter(3600);
 
-            return $this->serializer->serialize($this->paginator, "json");
+            $handlerAddLinks = new HandlerAddLinks();
+            $responseWithLinks = $handlerAddLinks->addLinksCollection($this->paginator);
+
+            return $this->serializer->serialize($responseWithLinks, "json");
+
+            // return $this->serializer->serialize($this->paginator, "json");
         });
 
         return new JsonResponse(

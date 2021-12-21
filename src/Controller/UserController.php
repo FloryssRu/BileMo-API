@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Services\HandlerAddLinks;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Annotations as OA;
@@ -57,9 +58,14 @@ class UserController extends AbstractController
         $this->paginator = $this->userRepository->getUserPaginator($page);
 
         $response = $this->cache->get('users_collection_' . $page, function (ItemInterface $item) {
-            $item->expiresAfter(3600);
+            $item->expiresAfter(600);
 
-            return $this->serializer->serialize($this->paginator, "json", ['groups' => 'get']);
+            $handlerAddLinks = new HandlerAddLinks();
+            $responseWithLinks = $handlerAddLinks->addLinksCollection($this->paginator);
+
+            return $this->serializer->serialize($responseWithLinks, "json", ['groups' => 'get']);
+
+            //return $this->serializer->serialize($this->paginator, "json", ['groups' => 'get']);
         });
 
         return new JsonResponse(
