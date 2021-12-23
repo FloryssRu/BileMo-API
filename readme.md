@@ -14,8 +14,8 @@ This project contains phones and users fixtures to test the API, entities, contr
 Documentation
 -
 You can find the documentation in these links :  
-Documentation [Json](http://127.0.0.1:8000/api/doc.json "Link to doc in json")  
-Documentation [HTML](http://127.0.0.1:8000/api/doc "Link to doc in html")
+Documentation Json : `http://127.0.0.1:8000/api/doc.json`  
+Documentation HTML : `http://127.0.0.1:8000/api/doc`
 
 What do I need ? - Prerequisite
 -
