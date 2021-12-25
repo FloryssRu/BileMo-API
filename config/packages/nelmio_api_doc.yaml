@@ -1,0 +1,20 @@
+nelmio_api_doc:
+    areas:
+        path_patterns: # an array of regexps
+            - ^/api(?!/doc$)
+    documentation:
+        servers:
+            - url: http://127.0.0.1:8000/api/
+              description: API over HTTP
+        info:
+            title: BileMo API
+            description: Provides you a phones database and the CRUD actions to manage your users
+            version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - Bearer: []

@@ -6,6 +6,7 @@ use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Annotations as OA;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -61,6 +62,12 @@ class Client implements PasswordAuthenticatedUserInterface, UserInterface
      * @ORM\OneToMany(targetEntity=User::class, mappedBy="client")
      */
     private $users;
+
+    /**
+     * @ORM\Column(type="json")
+     * @OA\Property(type="array", @OA\Items(type="string"))
+     */
+    private $roles = [];
 
     public function __construct()
     {
@@ -150,14 +157,28 @@ class Client implements PasswordAuthenticatedUserInterface, UserInterface
         return $this;
     }
 
-    public function getRoles()
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
     {
-        return [];
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
-    public function getSalt()
+    public function setRoles(array $roles): self
     {
-        
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    public function getSalt(): string
+    {
+        return '';
     }
 
     public function eraseCredentials()
@@ -165,7 +186,7 @@ class Client implements PasswordAuthenticatedUserInterface, UserInterface
 
     }
 
-    public function getUserIdentifier()
+    public function getUserIdentifier(): string
     {
         return $this->email;
     }

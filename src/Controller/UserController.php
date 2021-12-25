@@ -4,7 +4,10 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Services\HandlerAddLinks;
 use Doctrine\ORM\EntityManagerInterface;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,14 +37,33 @@ class UserController extends AbstractController
     }
 
     /**
+     * Lists the collection of all the users in database.
+     * 
      * @Route(name="api_user_list", methods={"GET"})
+     * @OA\Response(
+     *      response=200,
+     *      description="Lists the collection of users"
+     * )
+     * @OA\Tag(name="users")
+     * @Security(name="Bearer")
      */
-    public function collection(): JsonResponse
+    public function collection(Request $request): JsonResponse
     {
-        $response = $this->cache->get('users_collection', function (ItemInterface $item) {
+        if (0 < intval($request->query->get("page"))) {
+            $page = intval($request->query->get("page"));
+        } else {
+            $page = 1;
+        }
+
+        $this->paginator = $this->userRepository->getUserPaginator($page);
+
+        $response = $this->cache->get('users_collection_' . $page, function (ItemInterface $item) {
             $item->expiresAfter(3600);
 
-            return $this->serializer->serialize($this->userRepository->findAll(), "json", ['groups' => 'get']);
+            $handlerAddLinks = new HandlerAddLinks();
+            $responseWithLinks = $handlerAddLinks->addLinksCollection($this->paginator);
+
+            return $this->serializer->serialize($responseWithLinks, "json", ['groups' => 'get']);
         });
 
         return new JsonResponse(
@@ -53,32 +75,15 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="api_user_item", methods={"GET"})
-     */
-    public function item($id): JsonResponse
-    {
-        $this->id = $id;
-
-        $response = $this->cache->get('users_item_' . $this->id, function (ItemInterface $item) {
-            $item->expiresAfter(3600);
-
-            if ($this->userRepository->findOneBy(['id' => $this->id]) === NULL || !is_int($this->id)) {
-                throw new HttpException(404);
-            }
-
-            return $this->serializer->serialize($this->userRepository->findOneBy(['id' => $this->id]), "json", ['groups' => 'get']);
-        });
-
-        return new JsonResponse(
-            $response,
-            JsonResponse::HTTP_OK,
-            [],
-            true
-        );
-    }
-
-    /**
+     * Create a new user with the data given
+     * 
      * @Route("/create", name="api_user_create", methods={"POST"})
+     * @OA\Response(
+     *     response=201,
+     *     description="Creates an user"
+     * )
+     * @OA\Tag(name="users")
+     * @Security(name="Bearer")
      */
     public function create(Request $request, EntityManagerInterface $em): JsonResponse
     {
@@ -98,7 +103,63 @@ class UserController extends AbstractController
     }
 
     /**
+     * Finds and return the user associate to the id given
+     * 
+     * @Route("/{id}", name="api_user_item", methods={"GET"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns an user"
+     * )
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="The field used to find the user",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="users")
+     * @Security(name="Bearer")
+     */
+    public function item($id): JsonResponse
+    {
+        $this->id = intval($id);
+
+        $response = $this->cache->get('users_item_' . $this->id, function (ItemInterface $item) {
+            $item->expiresAfter(3600);
+
+            if ($this->userRepository->findOneBy(['id' => $this->id]) === NULL || !is_int($this->id)) {
+                throw new HttpException(404);
+            }
+
+            $handlerAddLinks = new HandlerAddLinks();
+            $responseWithLinks = $handlerAddLinks->addLinksItem($this->userRepository->findOneBy(['id' => $this->id]));
+
+            return $this->serializer->serialize($responseWithLinks, "json", ['groups' => 'get']);
+        });
+
+        return new JsonResponse(
+            $response,
+            JsonResponse::HTTP_OK,
+            [],
+            true
+        );
+    }
+
+    /**
+     * Finds, modifies with the data given and return the user associate to the id given
+     * 
      * @Route("/edit/{id}", name="api_user_put", methods={"PUT"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Edit an user"
+     * )
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="The field used to find the user",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="users")
+     * @Security(name="Bearer")
      */
     public function put(Request $request, EntityManagerInterface $em, int $id): JsonResponse
     {
@@ -121,7 +182,21 @@ class UserController extends AbstractController
     }
 
     /**
+     * Delete the user related to the id given
+     * 
      * @Route("/delete/{id}", name="api_user_delete", methods={"DELETE"})
+     * @OA\Response(
+     *     response=204,
+     *     description="Delete an user"
+     * )
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="The field used to find the user",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="users")
+     * @Security(name="Bearer")
      */
     public function delete(int $id, UserRepository $userRepository, EntityManagerInterface $em): JsonResponse
     {

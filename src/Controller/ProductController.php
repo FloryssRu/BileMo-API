@@ -3,9 +3,13 @@
 namespace App\Controller;
 
 use App\Repository\ProductRepository;
+use App\Services\HandlerAddLinks;
+use Nelmio\ApiDocBundle\Annotation\Security;
+use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -30,14 +34,33 @@ class ProductController extends AbstractController
     }
 
     /**
+     * Lists the collection of all the phones in database.
+     * 
      * @Route(name="api_product_list", methods={"GET"})
+     * @OA\Response(
+     *      response=200,
+     *      description="Lists the phone collection"
+     * )
+     * @OA\Tag(name="products")
+     * @Security(name="Bearer")
      */
-    public function collection(): JsonResponse
+    public function collection(Request $request): JsonResponse
     {
-        $response = $this->cache->get('products_collection', function (ItemInterface $item) {
+        if (0 < intval($request->query->get("page"))) {
+            $page = intval($request->query->get("page"));
+        } else {
+            $page = 1;
+        }
+
+        $this->paginator = $this->productRepository->getProductPaginator($page);
+
+        $response = $this->cache->get('products_collection_' . $page, function (ItemInterface $item) {
             $item->expiresAfter(3600);
 
-            return $this->serializer->serialize($this->productRepository->findAll(), "json");
+            $handlerAddLinks = new HandlerAddLinks();
+            $responseWithLinks = $handlerAddLinks->addLinksCollection($this->paginator);
+
+            return $this->serializer->serialize($responseWithLinks, "json");
         });
 
         return new JsonResponse(
@@ -49,11 +72,25 @@ class ProductController extends AbstractController
     }
 
     /**
+     * Finds and returns the product associate to the id given
+     * 
      * @Route("/{id}", name="api_product_item", methods={"GET"})
+     * @OA\Response(
+     *     response=200,
+     *     description="Returns a product"
+     * )
+     * @OA\Parameter(
+     *     name="id",
+     *     in="path",
+     *     description="The field used to find the product",
+     *     @OA\Schema(type="int")
+     * )
+     * @OA\Tag(name="products")
+     * @Security(name="Bearer")
      */
     public function item($id): JsonResponse
     {
-        $this->id = $id;
+        $this->id = intval($id);
 
         $response = $this->cache->get('products_item_' . $this->id, function (ItemInterface $item) {
             $item->expiresAfter(3600);
@@ -62,7 +99,10 @@ class ProductController extends AbstractController
                 throw new HttpException(404);
             }
 
-            return $this->serializer->serialize($this->productRepository->findOneBy(['id' => $this->id]), "json");
+            $handlerAddLinks = new HandlerAddLinks();
+            $responseWithLinks = $handlerAddLinks->addLinksItem($this->productRepository->findOneBy(['id' => $this->id]));
+
+            return $this->serializer->serialize($responseWithLinks, "json");
         });
 
         return new JsonResponse(
